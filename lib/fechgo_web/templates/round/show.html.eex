@@ -1,0 +1,13 @@
+<h2>Show Round</h2>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @round.name %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: round_path(@conn, :edit, @round) %></span>
+<span><%= link "Back", to: round_path(@conn, :index) %></span>

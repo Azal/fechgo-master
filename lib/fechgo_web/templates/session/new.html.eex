@@ -1,0 +1,26 @@
+<!-- Content, mantener este como el unico container para evitar sumar los margenes en retina-->
+<%= form_for @conn, session_path(@conn, :create), [as: :session], fn f -> %>
+    <div id="content" class="container">
+        <div class="container-small formulario">
+            <h2>Login</h2>
+            <div class="row">
+                <div>
+                    <label class="label" for="username">Nombre de usuario</label>
+                    <div class="input full-width">
+                        <%= text_input f, :username, placeholder: "Username", class: "form-control" %>
+                    </div>
+                </div>
+                <div>
+                    <label class="label" for="password">Password</label>
+                    <div class="input full-width">
+                        <%= password_input f, :password, placeholder: "Password", class: "form-control" %>
+                    </div>
+                </div>
+            </div>
+            <div class="submiter">
+                <%= submit "Log in", class: "button button-big block-mobile" %>
+            </div>
+        </div>
+    </div>
+<% end %>
+    <!-- END Content-->

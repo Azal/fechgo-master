@@ -1,0 +1,163 @@
+    <div class="filtros container">
+        <div class="row justify-content-between">
+            <div class="col-xs-12 col-md-4">
+                Ordenar por:
+                <div class="select">
+                    <select name="t-order" id="t-order">
+                            <option value="points">Puntaje</option>
+                            <option value="name" >Nombre</option>
+                    </select>
+                    <i class="icon down"></i>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                Filtrar por Club:
+                <div class="select">
+                    <select name="club-filter" id="club-filter">
+                    <option value="all"> Todos </option>
+                        <%= for club <- @clubs do %>
+                            <option value="<%= club.name %>"><%= club.name %></option>
+                        <% end %>
+                        <option value="Sin Afiliación">Sin Afiliación</option>
+                    </select>
+                    <i class="icon down"></i>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-md-4"></div>
+
+            <div class="col-xs-12 col-md-4">
+                <div class="form-collapse">
+                    <div class="input item item-main">
+                        <input id="search" placeholder="Buscar" type="text" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <div id="jugadores" class="container">
+        <!-- players -->
+        <div>
+            <ul class="row player-items">
+              <%= for player <- get_players_sorted_by_rank(@players, @ranking_history) do %>
+                <!-- item-->
+                <li class="col-xs-12 col-sm-6 col-md-4 player-item" clubfilter="false">
+                    <%= link to: player_path(@conn, :show, player), class: "player-hover" do %>
+                        <div class="vertical-wrap">
+                            <div class="rank">
+                                <div class="vertical">Rank <b><%= Player.get_current_rank(player, @ranking_history) %></b></div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <div class="avatar">
+                                <%= if(player.avatar) do %>
+                                    <img src="<%= static_path(@conn, "/uploads/#{player.avatar}") %> ">
+                                <% else %>
+                                    <img src="<%= static_path(@conn, "/images/no-profile.jpg") %> ">
+                                <% end %>
+                            </div>
+                            <div class="player-details">
+                                <h4 fullname="<%= Player.get_full_name(player) %>">
+                                    <%= player.first_name %><br/>
+                                    <%= player.last_name %>
+                                </h4>
+                                <div class="clubname" clubname="<%= Player.get_club_name(player) %>">
+                                    <i class="icon small club-fill"></i>
+                                    <b>Club </b><%= Player.get_club_name(player) %>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="player-stats">
+                            <span><%= Player.get_current_points(player, @ranking_history ) %></span><b> Puntos </b>
+                        </div>
+                    <% end %>
+                    <%= if(@current_user) do %>
+                        <div class="actions">
+                            <%= link to: player_path(@conn, :edit, player) do %>
+                                <i class='icon edit'></i>
+                            <% end %>
+                            <%= link to: player_path(@conn, :delete, player), method: :delete, data: [confirm: "Are you sure?"] do %>
+                                <i class="icon delete"></i>
+                            <% end %>
+                        </div>
+                    <% end %>
+                </li>
+                <!-- END item-->
+              <% end %>
+            </ul>
+        </div>
+        <!-- END Stats Table -->
+    </div>
+
+    <div class="pages container">
+        <ul class="paginator-list">
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link"> Anterior </a>
+            </li>
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link">1</a>
+            </li>
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link active">2</a>
+            </li>
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link">3</a>
+            </li>
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link">Siguiente</a>
+            </li>
+        </ul>
+    </div>
+<script>
+    // Filter player items over their names on search input
+    $('#search').on('input',function(e){
+        var search = $("#search").val().toUpperCase()
+        $(".player-item").each(function(){
+            var player_name = $(this).find("h4").attr("fullname").toUpperCase()
+            
+            if(player_name.includes(search) && $(this).attr("clubfilter") == "false")
+                $(this).show()
+            else
+                $(this).hide()
+        })
+    });
+    // Filter players by club selection
+    $("#club-filter").change(function() {
+        // If option is to see All clubs
+        if($(this).val() == "all"){
+            $(".player-item").each(function(){
+                $(this).show().attr("clubfilter", false)
+            })
+            return
+        }
+        var club = $(this).val()
+        $(".player-item").each(function(){
+            if($(this).find(".clubname").attr("clubname") == club)
+                $(this).show().attr("clubfilter", false)
+            else
+                $(this).hide().attr("clubfilter", true)
+        })
+    });
+    // Sorts player items over their points on change of the select option
+    $("#t-order").change(function() {
+        $("select option:selected").each(function() {
+            if($(this).val() == 'name')
+                $(".player-items li").sort(sort_by_name).appendTo('.player-items');
+            else
+                $(".player-items li").sort(sort_by_points).appendTo('.player-items');
+        });
+    });
+    function sort_by_name(a, b) {
+        var aName = $(a).find("h4").text().toUpperCase()
+        var bName = $(b).find("h4").text().toUpperCase()
+        return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+    }
+    function sort_by_points(a, b) {
+        var aPoints = parseFloat($(a).find(".player-stats span").text())
+        var bPoints = parseFloat($(b).find(".player-stats span").text())
+        return ((aPoints > bPoints) ? -1 : ((aPoints < bPoints) ? 1 : 0));
+    }
+</script>

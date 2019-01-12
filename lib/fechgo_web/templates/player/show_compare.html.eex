@@ -1,0 +1,293 @@
+    <div class="container compare-selector">
+        <div class="row">
+            <div class="col-xs-10 relative"> 
+
+                <div class="col-xs-6 compare-select">
+                    <div class="input full-width">
+                        <input id="player1" class="autocomplete" placeholder="Nombre primer jugador" type="text">
+                    </div>
+                </div>
+                
+                <div class="col-xs-6 compare-select">
+                    <div class="input full-width">
+                        <input id="player2" class="autocomplete" placeholder="Nombre segundo jugador" type="text">
+                    </div>
+                </div>
+
+                <div class="vs-hover">
+                    V/S
+                </div>
+            </div>
+            <div class="col-xs-2">
+                <a id="compare-now" class="button block-mobile">Comparar</a>
+            </div> 
+        </div>
+    </div>
+
+    <div class="perfil-compare container">
+        <!-- Profile cards -->
+        <div class="profile-card">
+            <div class="row compare-profiles">
+                <div class="col-xs-4 player"> <!--Datos Principales-->
+                 <%= link "", to: player_path(@conn, :show, @player), class: "link-screen" %>
+                    <div class="avatar">
+                        <%= if(@player.avatar) do %>
+                            <img src="<%= static_path(@conn, "/uploads/#{@player.avatar}") %> ">
+                        <% else %>
+                            <img src="<%= static_path(@conn, "/images/no-profile.jpg") %> ">
+                        <% end %>
+                    </div>
+                    <div class="rank-club">
+                        <div class="rank-title"><span>Ranking</span></div>
+                        <h2 class="rank-n"><%= Player.get_current_rank(@player, @ranking_history) %></h2>
+                        <div class="v-line"></div>
+                        <div class="compare-name">
+                            <h2>
+                                <%= @player.first_name %> <br/>
+                                <%= @player.last_name %>
+                            </h2>
+                        </div>
+                        <div class="club">
+                            <p>Club</p>
+                            <h3><%= Player.get_club_name(@player) %></h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-4 comparation">
+                    <div class="chart-donut">
+                        <div id="head-to-head-chart"></div>
+                        <h2>V/S</h2>
+                    </div>
+                    <div class="compare-victories">
+                        <div>
+                            <h4><%= @opp_stats.victories %></h4>
+                            <p>Victorias</p>
+                        </div>
+                        <div>
+                            <h4><%= @opp_stats.defeats %></h4>
+                            <p>Victorias</p>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="col-xs-4 player"> <!--Datos Principales-->
+                    <%= link "", to: player_path(@conn, :show, @opponent), class: "link-screen" %>
+                    <div class="avatar">
+                        <%= if(@opponent.avatar) do %>
+                            <img src="<%= static_path(@conn, "/uploads/#{@opponent.avatar}") %> ">
+                        <% else %>
+                            <img src="<%= static_path(@conn, "/images/no-profile.jpg") %> ">
+                        <% end %>
+                    </div>
+                    <div class="rank-club">
+                        <div class="compare-name">
+                            <h2>
+                                <%= @opponent.first_name %> <br/>
+                                <%= @opponent.last_name %>
+                            </h2>
+                        </div>
+                        <div class="v-line"></div>
+                        <div class="rank-title"><span>Ranking</span></div>
+                        <h2 class="rank-n"><%= Player.get_current_rank(@opponent, @ranking_history) %></h2>
+                        <div class="club">
+                            <p>Club</p>
+                            <h3><%= Player.get_club_name(@opponent)%></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Profile card-->
+
+
+        <!-- Stats Table -->
+        <div class="stats-table">
+            <table class="compare-table">
+                <tbody>
+                    <tr>
+                        <td><%= @player.city %></td>
+                        <td>Ciudad</td>
+                        <td><%= @opponent.city %></td>
+                    </tr>
+                    <tr>
+                        <td><%= Player.get_age(@player) %></td>
+                        <td>Edad</td>
+                        <td><%= Player.get_age(@opponent) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= Player.get_current_points(@player, @ranking_history) %></td>
+                        <td>Puntos</td>
+                        <td><%= Player.get_current_points(@opponent, @ranking_history) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= get_current_participation(@player, @ranking_history) %>%</td>
+                        <td>Participación</td>
+                        <td><%= get_current_participation(@opponent, @ranking_history) %>%</td>
+                    </tr>
+                    <tr>
+                        <td><%= get_total_played_games(@player) %></td>
+                        <td>Partidos</td>
+                        <td><%= get_total_played_games(@opponent) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= get_victories(@player) %></td>
+                        <td>Victorias</td>
+                        <td><%= get_victories(@opponent) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= get_defeats(@player) %></td>
+                        <td>Derrotas</td>
+                        <td><%= get_defeats(@opponent) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= get_draws(@player) %></td>
+                        <td>Empates</td>
+                        <td><%= get_draws(@opponent) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= get_places_at(@player, 1) %></td>
+                        <td>1er Lugar</td>
+                        <td><%= get_places_at(@opponent, 1) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= get_places_at(@player, 2) %></td>
+                        <td>2do Lugar</td>
+                        <td><%= get_places_at(@opponent, 2) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= get_places_at(@player, 3) %></td>
+                        <td>3er Luagar</td>
+                        <td><%= get_places_at(@opponent, 3) %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- END Stats Table -->
+
+        <!-- Stats Table -->
+        <div class="compare-tournaments">
+            <h2>Eventos comunes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Posicion</th>
+                        <th>Evento</th>
+                        <th>Posicion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <%= for tournament <- @common_tournaments do %>
+                    <tr>
+                        <td>
+                            <p><%= get_placement_for_tournament(@player, tournament) %> / <%= tournament.total_players %></p>
+                        </td>
+                        <td>
+                            <h6><%= link tournament.name, to: tournament_path(@conn, :show, tournament) %></h6>
+                            <p><%= tournament.date %></p>
+                        </td>
+                        <td>
+                            <p><%= get_placement_for_tournament(@opponent, tournament) %> / <%= tournament.total_players %></p>
+                        </td>
+                    </tr>
+                <% end %>
+                </tbody>
+            </table>
+        </div>
+        <!-- END Stats Table -->
+    </div>
+
+    <!-- Plugin de Materialize para autocompletar nombres de busqueda-->
+    <!---->
+    <script>
+        $(document).ready(function(){
+            var data = <%= raw(Poison.encode!(list_players(@players))) %>
+            
+            autocomplete_data = {}
+            for(i = 0; i < data.length; i++ ){
+               autocomplete_data[data[i][0]] = null
+            }
+            
+            $('input.autocomplete').autocomplete({
+                data: autocomplete_data,
+                limit: 6, // The max amount of results that can be shown at once. Default: Infinity.
+                minLength: 1
+            });
+            // Before anchor to another page. Set href for ids and check if ids are valid
+            $('#compare-now').click(function(e){
+                
+                player1_id = null
+                player2_id = null
+                for(i = 0; i < data.length; i++ ){
+                    if($('#player1.autocomplete')[0].value == data[i][0])
+                        player1_id = data[i][1]
+                    if($('#player2.autocomplete')[0].value == data[i][0])
+                        player2_id = data[i][1]
+                }
+                if(player1_id == null || player2_id == null || player1_id == player2_id){
+                    alert('Por favor seleccionar un jugador válido')
+                    e.preventDefault()
+                }
+                path = "/head-to-head/"+player1_id+"/"+player2_id
+                $('#compare-now').attr("href", path);
+            })
+        });
+        /* Esta es una alternativa orientada a un objeto json:
+
+            var elem = document.querySelector('.autocomplete');
+            var instance = M.Autocomplete.init(elem, options);
+        */
+        $(function() {
+            
+            var data = [
+            { name: "Victorias",
+                color: '#f15224',
+                y: <%= @opp_stats.victories %> 
+            },
+            {
+                name: "Empates",
+                color: '#666',
+                y: <%= @opp_stats.draws %>
+            },
+            {
+                name: "Derrotas",
+                color: '#fff',
+                y: <%= @opp_stats.defeats %>
+            }]
+            Highcharts.chart('head-to-head-chart', {
+                chart: {
+                    type: 'pie',
+                    backgroundColor: 'rgba(255, 255, 255, 0.0)'
+                },
+                credits: {
+                enabled: false
+                },
+                title: {
+                    text: null
+                },
+                tooltip: {
+                    enabled: false
+                },
+                plotOptions: {
+                pie: {
+                    borderColor: '#142123'
+                },
+                series: {
+                    states: {
+                        hover: {
+                            enabled: false,
+                        }
+                    }
+                }
+                },
+                series: [{
+                    data: data,
+                    size: '100%',
+                    innerSize: '80%',
+                    dataLabels: {
+                        enabled: false
+                    }
+                }]
+            });
+        });
+    </script>

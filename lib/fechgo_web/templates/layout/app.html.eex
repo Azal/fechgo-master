@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>FechGo</title>
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.0/moment-with-locales.js"></script>
+    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+  </head>
+
+  <body>
+    <div>
+      <div class="row">
+        <div class="col-sm-12">
+          <%
+            info = get_flash(@conn, :info)
+            error = get_flash(@conn, :error)
+          %>
+          <%= if info do %>
+            <div class="alert alert-info" role="alert"><%= info %></div>
+          <% end %>
+          <%= if error do %>
+            <div class="alert alert-danger" role="alert"><%= error %></div>
+          <% end %>
+        </div>
+      </div>
+        <!-- Navigation-->
+        <div class="nav container">
+            <div id="nav-top">
+                <div class="logo">
+                <!-- <img src="assets/images/logo.png"/> -->
+                </div>
+                <ul class="right-nav">
+                    <li><a href="http://www.igochile.cl/igochile2/"><i class="icon fed"></i>Federacion</a></li>
+                    <li><a href="https://www.facebook.com/groups/54609357847/"><i class="icon fb"></i>Facebook</a></li>
+                    <%= if(@current_user) do %>
+                        <li>
+                        <%= link "Log Out", to: session_path(@conn, :delete, @current_user), method: :delete %>
+                        <%="(#{@current_user.username})"%>
+                        </li>
+                    <% end %>
+                </ul>
+            </div>
+            <div id="main-menu">
+
+                <ul>
+                    <li><%= link to: page_path(@conn, :index) do %><i class="icon main1"></i>Principal<% end %> </li>
+                    <li><%= link to: player_path(@conn, :index) do %><i class="icon main2"></i>Jugadores<% end %> </li>
+                    <li><%= link to: tournament_path(@conn, :index) do %><i class="icon main3"></i>Torneos<% end %> </li>
+                </ul>
+            </div>
+            <div id="sub-menu">
+                <ul>
+                    <li><a href="#" class="submenu-logo"><i class="icon crg"></i></a></li>
+                    <li><%= link "Head to Head", to: player_path(@conn, :compare) %></li>
+                    <li><a href="#">Estadísticas</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- END Navigation-->
+        <!--IMPORTANTE: AGRAGADA NAVEGACION MOVIL (INCLUYE SCRIPT AL FINAL DE LA PAGINA)-->
+        <div class="mobile-wrapper">
+            <div class="mobile mobile-two">
+                <div class="header">
+                    <div class="menu-toggle">
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                    </div>
+                    <div class="mobile-logo">
+                        <!--logo-->
+                    </div>
+                </div>
+                <div class="mobile-nav">
+                    <h2>Federacion Chilena de Go</h2>
+                    <ul>
+                        <li><%= link to: page_path(@conn, :index) do %><i class="icon main1"></i>Principal<% end %> </li>
+                        <li><%= link to: player_path(@conn, :index) do %><i class="icon main2"></i>Jugadores<% end %> </li>
+                        <li><%= link to: tournament_path(@conn, :index) do %><i class="icon main3"></i>Torneos<% end %> </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- END Navigation-->
+    
+
+      <main role="main" class="content-wrap">
+        <%= render @view_module, @view_template, assigns %>
+      </main>
+    
+    </div> <!-- /container -->
+    
+   <footer>
+        <div class="container">
+            <div class="section text-center">
+                <h4>
+                    <img src="/images/footer-logo.png"/><br/>
+                </h4>
+                <p>
+                    <a href="http://www.igochile.cl/igochile2/">Pagina de la Federación</a> &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="mailto:contacto@igochile.cl" >contacto@igochile.cl</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+  </body>
+</html>
+
+<!--IMPORTANTE: AGRAGADA NAVEGACION MOVIL -->
+<script>
+    /* Menu para mobil*/
+    $(document).ready(function() {
+        $(".mobile-two .menu-toggle").click(function() {
+            $(this).parent().next(".mobile-nav").toggle(0 , "display");
+        });
+    });
+</script>

@@ -1,0 +1,188 @@
+    
+
+    <div class="tournament-content container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-9">
+                <div class="tournament-cover">
+                <% path = static_path(@conn, ~s(/uploads/#{@tournament.main_img})) %>
+                    <div class="tournament-cover-img" style="background-image:url(<%= path %>)"></div>
+                    <div class="tournament-hero">
+                        <h1><%= @tournament.name %></h1>
+                        <h2 id="tournament-date"></h2>
+                        <h3><%= @tournament.location %></h3>
+                        <p>Descripcion Opcional del Evento para explicar detalles específicos</p>
+                    </div>
+
+                    <div class="tournament-details">
+                        <div>
+                            <i class="icon small users"></i>
+                            <p>participantes</p>
+                            <h4><%= @tournament.total_players %></h4>
+                        </div>
+                        <div>
+                            <i class="icon small club"></i>
+                            <p>Club</p>
+                            <h4><%= @tournament.organizer.name %></h4>
+                        </div>
+                        <div>
+                            <i class="icon small tournament"></i>
+                            <p>Torneo</p>
+                            <h4><%= @tournament.tournament_type.name %></h4>
+                        </div>
+                        <div>
+                            <i class="icon small game"></i>
+                            <p>Rondas</p>
+                            <h4><%= Enum.count(@tournament.rounds)%></h4>
+                        </div>
+                        <div>
+                            <i class="icon small point"></i>
+                            <p>Puntos</p>
+                            <h4><%= get_total_points(@tournament)%></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="participantes">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Posición</th>
+                        <th>Nombre</th>
+                        <th>Club</th>
+                        <th>Puntos</th>
+                        <th>Victorias</th>
+                        <th>Derrotas</th>
+                        <th>Empates</th>
+                        <th>SOS</th>
+                        <th>SOSOS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <%= for scoreboard <- get_scoreboards_sorted_by_placement(@tournament) do %>
+                    <% player = get_player_by_scoreboard(scoreboard, @players) %>
+                    <tr>
+                        <td> <%= scoreboard.placement%> </td>
+                        <td><%= link Player.get_full_name(player), to: player_path(@conn, :show, player) %></td>
+                        <td> <%= Player.get_club_name(player) %> </td>
+                        <td> <%= get_points_by_scoreboard(scoreboard) %> </td>
+                        <td> <%= scoreboard.victories %> </td>
+                        <td> <%= scoreboard.defeats %> </td>
+                        <td> <%= scoreboard.draws %> </td>
+                        <td> <%= scoreboard.sos %> </td>
+                        <td> <%= scoreboard.sosos %> </td>
+                    </tr>
+                <% end %>
+                </tbody>
+            </table>
+            </div>
+        </div> <!-- END lift bar-->
+
+                <div class="col-xs-12 col-sm-4 col-md-3 bar-right"> <!-- AKA Barra negra -->
+                <!-- Tab links -->
+                    <div class="row">
+                    <ul class="tabs">
+                        <li class="tab col-xs-6"><a class="active" href="#Resultados">Resultados</a></li> 
+                        <li class="tab col-xs-6"><a href="#Rondas">Rondas</a></li>
+                    </ul>
+                </div>
+                    <div id="Resultados" class="tabs-content">
+                        <div>
+                            <h2>Ganadores</h2>
+                            <% first_places = get_n_places_by_tournament(@tournament, 1) %>
+                            <% second_places = get_n_places_by_tournament(@tournament, 2) %>
+                            <% third_places = get_n_places_by_tournament(@tournament, 3) %>
+                            <ul class="winners">
+                                <%= if Enum.count(first_places) > 0 do %>
+                                <li>
+                                    <%= for scoreboard <- first_places do %>
+                                        <% player = get_player_by_scoreboard(scoreboard, @players) %>
+                                        <%= link Player.get_full_name(player), to: player_path(@conn, :show, player )%>
+                                    <% end %>
+                                </li>
+                                <% end %>
+                                <%= if Enum.count(second_places) > 0 do %>
+                                <li>
+                                    <%= for scoreboard <- second_places do %>
+                                        <% player = get_player_by_scoreboard(scoreboard, @players) %>
+                                        <%= link Player.get_full_name(player), to: player_path(@conn, :show, player )%>
+                                    <% end %>
+                                </li>
+                                <% end %>
+                                <%= if Enum.count(third_places) > 0 do %>
+                                <li>
+                                    <%= for scoreboard <- third_places do %>
+                                        <% player = get_player_by_scoreboard(scoreboard, @players) %>
+                                        <%= link Player.get_full_name(player), to: player_path(@conn, :show, player )%>
+                                    <% end %>
+                                </li>
+                                <% end %>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <% members_grouped_by_clubs = get_members_grouped_by_clubs(@tournament, @players) %>
+                            <h2>Clubes participantes<span><%= Enum.count(members_grouped_by_clubs) %></span></h2>
+                            <ul class="clubs">
+                            <%= for {club_id, members} <- members_grouped_by_clubs do %>
+                            <% club = Enum.find(@clubs, &(&1.id == club_id ))%>
+                            <% club_points = Enum.reduce(members, 0, fn(x, acc) -> x.points + acc end)%>
+                                <li>
+                                    <a href="#" class="row">
+                                        <div class="col-xs-6 clubname">
+                                            <i class="icon small club-fill"></i>
+                                            <%= if club, do: club.name, else: "Sin Afiliación" %>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <%= Enum.count(members) %>
+                                            <i class="icon small users-fill"></i>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <%= Float.round(club_points, 1) %>
+                                        </div>
+                                    </a>
+                                </li>
+                            <% end %>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="Rondas" class="tabcontent">
+                        <div class="color-pieces">
+                            <i class="icon whitepiece"></i><i class="icon blackpiece"></i>
+                        </div>
+                        <div class="accordeon">
+                            <%= for round <- @tournament.rounds do %>
+                            <div class="accordeon-item">                            
+                                <input id="<%= ~s(Ronda_#{round.id})%>" type="checkbox" name="accordeon">
+                                <label for="<%= ~s(Ronda_#{round.id})%>"><%= round.name %></label>
+                                <div class="tab-content">
+                                    <table>
+                                        <%= for game <- round.games do %>
+                                        <tr>
+                                        <%= case game.result do %>
+                                            <% "white" -> %>
+                                            <td><%= game.white.first_name %><br/><%= game.white.last_name %> <i class="icon winner"></i></td>
+                                            <td><%= game.black.first_name %><br/><%= game.black.last_name %> <i class="icon"></i></td>
+                                            <% "black" -> %>
+                                            <td><%= game.white.first_name %><br/><%= game.white.last_name %> <i class="icon"></i></td>
+                                            <td><%= game.black.first_name %><br/><%= game.black.last_name %> <i class="icon winner"></i></td>
+                                        <% end %>
+                                        </tr>
+                                        <% end %>
+                                    </table>
+                                </div>
+                            </div>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+
+        
+    </div>
+<script>
+    // Uses moment.js to set tournament date
+    moment.locale("es");
+    var date = moment("<%= @tournament.date %>").format('D MMMM YYYY').replace(/\b\w/g, l => l.toUpperCase());
+    document.getElementById("tournament-date").innerHTML = date;
+    
+</script>

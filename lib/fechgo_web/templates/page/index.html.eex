@@ -1,0 +1,368 @@
+<!-- Hero torneos-->
+    <div class="tournaments container">
+        <h1 class="title">Últimos Torneos</h1>
+        <div class="tournament-cover">
+            <% last_tournament = List.first(@tournaments)%>
+            <%= link to: tournament_path(@conn, :show, last_tournament) do %>
+                <% path = static_path(@conn, ~s(/uploads/#{last_tournament.main_img})) %>
+                <div class="tournament-cover-img" style="background-image:url(<%= path %>)"></div>
+                <div class="tournament-hero">
+                    <h1><%= last_tournament.name %></h1>
+                    <h2 id="tournament-date-<%= last_tournament.id %>"></h2>
+                    <h3><%= last_tournament.location %></h3>
+                </div>
+
+                <div class="tournament-details">
+                    <div>
+                        <i class="icon small users"></i>
+                        <p>Participantes</p>
+                        <h4><%= last_tournament.total_players %></h4>
+                    </div>
+                    <div>
+                        <i class="icon small club"></i>
+                        <p>Club</p>
+                        <h4><%= last_tournament.organizer.name %></h4>
+                    </div>
+                    <div>
+                        <i class="icon small tournament"></i>
+                        <p>Torneo</p>
+                        <h4><%= last_tournament.tournament_type.name %></h4>
+                    </div>
+                    <div>
+                        <i class="icon small game"></i>
+                        <p>Rondas</p>
+                        <h4><%= Enum.count(last_tournament.rounds)%></h4>
+                    </div>
+                    <div>
+                        <i class="icon small point"></i>
+                        <p>Puntos</p>
+                        <h4><%= get_total_points_by_tournament(last_tournament) %></h4>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+
+        <!-- Tournaments subcover-->
+        <div class="tournaments-small">
+            <ul class="row">
+              <%= for tournament <- Enum.take(@tournaments, -3) do %>
+                <li class="col-xs-4 tournament-small">
+                    <%= link to: tournament_path(@conn, :show, tournament) do %>
+                        <% path = static_path(@conn, ~s(/uploads/#{tournament.main_img})) %>
+                        <div class="tournament-cover-img" style="background-image:url(<%= path %>)"></div>
+                        <div class="tournament-hero">
+                            <h1><%= tournament.name %></h1>
+                            <h2 id="tournament-date-<%= tournament.id %>"></h2>
+                            <h3><%= tournament.location %></h3>
+                        </div>
+
+                        <div class="tournament-details">
+                            <div>
+                                <i class="icon small users"></i>
+                                <p>Participantes</p>
+                                <h4><%= tournament.total_players %></h4>
+                            </div>
+                            <div>
+                                <i class="icon small club"></i>
+                                <p>Club</p>
+                                <h4><%= tournament.organizer.name %></h4>
+                            </div>
+                            <div>
+                                <i class="icon small tournament"></i>
+                                <p>Torneo</p>
+                                <h4><%= tournament.tournament_type.name %></h4>
+                            </div>
+                        </div>
+                    <% end %>
+                </li>
+              <% end %>
+            </ul>
+        </div>
+        <div class="see-more"><%= link "Ver más", to: tournament_path(@conn, :index) %></div>
+    </div>
+    <!-- END Hero torneos-->
+
+
+    <!-- Rankings section -->
+    <div id="rankings" class="container">
+        <h1 class="title">Ranking top Jugadores</h1>
+        <div class="flexX">
+            <div>
+                <div class="top3">
+                  <% last_tournament_ranked = List.first(@ranking_history)%>
+                  <% top_1 = Enum.at(last_tournament_ranked.ranking, 0) %>
+                  <% top_2 = Enum.at(last_tournament_ranked.ranking, 1) %>
+                  <% top_3 = Enum.at(last_tournament_ranked.ranking, 2) %>
+                    <!-- Card-->
+                    <div class="profile-rank grid">
+                        <%= link to: player_path(@conn, :show, top_1.player) do %>
+                            <div class="top3rank">
+                                <div class="rank-title"></div>
+                                <h2 class="rank-n"><%= Player.get_current_rank(top_1.player, @ranking_history) %></h2>
+                            </div>
+                            <div class="avatar">
+                                <div>
+                                <%= if(top_1.player.avatar) do %>
+                                    <img src="<%= static_path(@conn, "/uploads/#{top_1.player.avatar}") %> ">
+                                <% else %>
+                                    <img src="<%= static_path(@conn, "/images/no-profile.jpg") %> ">
+                                <% end %>
+                                </div>
+                            </div>
+                            <h1>
+                                <%= top_1.player.first_name %> <br/>
+                                <%= top_1.player.last_name %>
+                            </h1>
+                            <div class="club">
+                                <p>Club</p>
+                                <h3><%= Player.get_club_name(top_1.player)%></h3>
+                            </div>
+                            <div class="puntajes">
+                                <h4><%= Float.round(top_1.points, 1) %><span> Puntos</span></h4>
+                            </div>
+                            <div class="titulos">
+                                <% first = Enum.count(top_1.player.scoreboards, fn(x) -> x.placement == 1 end) %>
+                                <% second = Enum.count(top_1.player.scoreboards, fn(x) -> x.placement == 2 end) %>
+                                <% third = Enum.count(top_1.player.scoreboards, fn(x) -> x.placement == 3 end) %>
+                                <p>Títulos</p>
+                                <span class="gold title"><%= first %></span>
+                                <span class="silver title"><%= second %></span>
+                                <span class="bronze title"><%= third %></span>
+                            </div>
+                        <% end %>
+                    </div>
+                    <!-- END card-->
+
+                    <!-- Card-->
+                    <div class="profile-rank grid">
+                        <%= link to: player_path(@conn, :show, top_2.player) do %>
+                            <div class="top3rank">
+                                <div class="rank-title"></div>
+                                <h2 class="rank-n"><%= Player.get_current_rank(top_2.player, @ranking_history) %></h2>
+                            </div>
+                            <div class="avatar">
+                                <div>
+                                    <%= if(top_2.player.avatar) do %>
+                                    <img src="<%= static_path(@conn, "/uploads/#{top_2.player.avatar}") %> ">
+                                <% else %>
+                                    <img src="<%= static_path(@conn, "/images/no-profile.jpg") %> ">
+                                <% end %>
+                                </div>
+                            </div>
+                            <h1>
+                                <%= top_2.player.first_name %> <br/>
+                                <%= top_2.player.last_name %>
+                            </h1>
+                            <div class="club">
+                                <p>Club</p>
+                                <h3><%= Player.get_club_name(top_2.player)%></h3>
+                            </div>
+                            <div class="puntajes">
+                                <h4><%= Float.round(top_2.points, 1) %><span> Puntos</span></h4>
+                            </div>
+                            <div class="titulos">
+                                <% first = Enum.count(top_2.player.scoreboards, fn(x) -> x.placement == 1 end) %>
+                                <% second = Enum.count(top_2.player.scoreboards, fn(x) -> x.placement == 2 end) %>
+                                <% third = Enum.count(top_2.player.scoreboards, fn(x) -> x.placement == 3 end) %>
+                                <p>Títulos</p>
+                                <span class="gold title"><%= first %></span>
+                                <span class="silver title"><%= second %></span>
+                                <span class="bronze title"><%= third %></span>
+                            </div>
+                        <% end %>
+                    </div>
+                    <!-- END card-->
+
+                    <!-- Card-->
+                    <div class="profile-rank grid">
+                        <%= link to: player_path(@conn, :show, top_3.player) do %>
+                            <div class="top3rank">
+                                <div class="rank-title"></div>
+                                <h2 class="rank-n"><%= Player.get_current_rank(top_3.player, @ranking_history) %></h2>
+                            </div>
+                            <div class="avatar">
+                                <div>
+                                <%= if(top_3.player.avatar) do %>
+                                    <img src="<%= static_path(@conn, "/uploads/#{top_3.player.avatar}") %> ">
+                                <% else %>
+                                    <img src="<%= static_path(@conn, "/images/no-profile.jpg") %> ">
+                                <% end %>
+                                </div>
+                            </div>
+                            <h1>
+                                <%= top_3.player.first_name %> <br/>
+                                <%= top_3.player.last_name %>
+                            </h1>
+                            <div class="club">
+                                <p>Club</p>
+                                <h3><%= Player.get_club_name(top_3.player) %></h3>
+                            </div>
+                            <div class="puntajes">
+                                <h4><%= Float.round(top_3.points, 1) %><span> Puntos</span></h4>
+                            </div>
+                            <div class="titulos">
+                                <% first = Enum.count(top_3.player.scoreboards, fn(x) -> x.placement == 1 end) %>
+                                <% second = Enum.count(top_3.player.scoreboards, fn(x) -> x.placement == 2 end) %>
+                                <% third = Enum.count(top_3.player.scoreboards, fn(x) -> x.placement == 3 end) %>
+                                <p>Títulos</p>
+                                <span class="gold title"><%= first %></span>
+                                <span class="silver title"><%= second %></span>
+                                <span class="bronze title"><%= third %></span>
+                            </div>
+                        <% end %>
+                    </div>
+                    <!-- END card-->
+
+                </div>
+            </div>
+
+            <div>
+                <div class="top4-10">
+                    <ul>
+                        <!--player-->
+                        <% top_4_10 = Enum.take(get_current_top_n_players(@ranking_history, 10), -7) %>
+                        <%= for player <- top_4_10 do %>
+                            <li class="profile-rank">
+                                <div><%= Player.get_current_rank(player, @ranking_history) %></div>
+                                <div>
+                                    <%= link Player.get_full_name(player), to: player_path(@conn, :show, player)  %>
+                                    <p class="club"><i class="icon small club-fill"></i>
+                                        <%= Player.get_club_name(player) %>
+                                    </p>
+                                </div>
+                                <div>
+                                    <h6><%= Player.get_current_points(player, @ranking_history) %><span>Puntos</span></h6>
+                                    <p class="titulos">
+                                        <% first = Enum.count(player.scoreboards, fn(x) -> x.placement == 1 end) %>
+                                        <% second = Enum.count(player.scoreboards, fn(x) -> x.placement == 2 end) %>
+                                        <% third = Enum.count(player.scoreboards, fn(x) -> x.placement == 3 end) %>
+                                        <span class="gold title"><%= first %></span>
+                                        <span class="silver title"><%= second %></span>
+                                        <span class="bronze title"><%= third %></span>
+                                    </p>
+                                </div>
+                            </li>
+                        <% end %>
+                        <!-- END player-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+     </div>
+    <!-- END Rankings section -->
+
+    <!-- Rankings chart -->
+        <div id="ranking-chart" class="container">
+            <div class="chart-users">
+                <h1>
+                    PROGRESO DEL RANKING (TOP 10)
+                </h1>
+                <div id="main-ranking" style="height: 400px"></div>
+            </div>
+        </div>
+        <!-- END Rankings chart -->
+<script>
+    // Uses moment.js to set tournament date
+    moment.locale("es");
+    <%= for tournament <- @tournaments do %>
+      var date = moment("<%= tournament.date %>").format('D MMMM YYYY').replace(/\b\w/g, l => l.toUpperCase());
+      document.getElementById("tournament-date-<%= tournament.id %>").innerHTML = date;
+    <% end %>
+
+    // Begin of main-ranking chart of the current top 10 players
+    var series = [
+        <%= for player <- get_current_top_n_players(@ranking_history, 10) do %>
+
+        <% result = process_ranking_history_for_chart(player, @ranking_history) %>
+        {
+            name: <%= raw(Poison.encode!(result.name)) %>,
+            data: <%= raw(Poison.encode!(result.data)) %>
+        },
+        <% end %>
+    ]
+    // Necessary for parsing correct date format from elxiir to javacript
+    for(i = 0; i < series.length; i++){
+        for(j = 0; j < series[i].data.length; j++)
+            series[i].data[j][0] = Date.parse(series[i].data[j][0])
+    }
+    Highcharts.chart('main-ranking', {
+
+            credits: {
+                enabled: false
+            },
+            chart: {
+                backgroundColor: 'rgba(255, 255, 255, 0.0)',
+                type: 'spline',
+            },
+            title: {
+                text: null
+            },
+
+            plotOptions: {
+                series: {
+                    marker: {
+                        enabled: false
+                    }
+                }
+            },
+
+            legend: {
+                itemStyle: {
+                    color: '#fff',
+                    fontWeight: 'bold'
+                },
+                itemHoverStyle: {
+                    color: '#1e8bee'
+                }
+            },
+
+            xAxis: {
+                type: 'datetime',
+                lineColor: '#999',
+                labels: {
+                    style: {
+                        color: '#999'
+                    }
+                }
+            },
+            yAxis: {
+                title: null,
+                gridLineWidth: 0,
+                minorGridLineWidth: 0,
+                opposite: true,
+                lineColor: '#999',
+                lineWidth: 1,
+                labels: {
+                    style: {
+                        color: '#999'
+                    }
+                }
+            },
+
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                borderWidth: 0,
+                useHTML: true,
+                style: {
+                    color: '#fff',
+                },
+                // Funcion que ordena las series del tooltip segun valor (ranking)
+                formatter: function (tooltip) {
+                    var items = this.points || splat(this),
+                        series = items[0].series,
+                        s;
+
+                    // sort the values
+                    items.sort(function(a, b){
+                        return ((a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
+                    });
+                    items.reverse();
+
+                    return tooltip.defaultFormatter.call(this, tooltip);
+                },
+                shared: true
+            },
+
+            series: series
+        });
+</script>

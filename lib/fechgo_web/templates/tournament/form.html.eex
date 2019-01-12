@@ -1,0 +1,71 @@
+
+<%= form_for @changeset, @action, [multipart: true], fn f -> %>
+  <%= if assigns[:invalid_players] do %>
+    <div class="alert alert-danger">
+      <p> These Players are not registered in the Database:</p>
+      <%= for player <- @invalid_players do %>
+        <p><%= player %></p>
+    <% end %>
+    </div>
+  <% end %>
+    <div class="row">
+        <div>
+            <label class="label" for="tourname">Nombre del torneo</label>
+            <div class="input full-width">
+                <%= text_input f, :name, class: "form-control" %>
+                <%= error_tag f, :name %>
+            </div>
+        </div>
+        <div>
+            <label class="label" for="location">Ubicacion</label>
+            <div class="input full-width">
+                <%= text_input f, :location, class: "form-control" %>
+                <%= error_tag f, :location %>
+            </div>
+        </div>
+        <div>
+            <label class="label" for="datepicker">Fecha</label>
+            <%= date_select f, :date, year: [options: 2017..Date.utc_today().year], class: "form-control" %>
+            <%= error_tag f, :date %>
+        </div>
+        <div class="check-validation">
+            <div class="checkbox">
+                <%= checkbox f, :point_valid, class: "checkbox", id: "checkbox1" %>
+                <%= error_tag f, :point_valid %>
+                <label for="checkbox1">Válido por puntos</label>
+            </div>
+        </div>
+        <div>
+            <label class="label" for="organizer">Organizador</label>
+            <div class="select full-width">
+              <%= select f, :organizer_id, @clubs, class: "form-control" %>
+              <%= error_tag f, :organizer_id %>
+            </div>
+        </div>
+        <div>
+            <label class="label" for="firstname">Seleccionar Categoría del Torneo</label>
+            <div class="select full-width">
+                <%= select f, :tournament_type_id, @tournament_types, class: "form-control" %>
+                <%= error_tag f, :tournament_type_id %>
+            </div>
+        </div>
+
+        <label class="label" for="firstname">Subir imágen principal del Torneo</label>
+        <div class='upload-panel'>
+            <%= file_input f, :main_img, class: "button block-mobile upload-btn" %>
+        </div>
+
+        <label class="label" for="firstname">Subir Archivo del Torneo</label>
+        <div class='upload-panel'>
+            <%= file_input f, :file, class: "button block-mobile upload-btn" %>
+        </div>
+
+    </div>
+    <hr>
+    <div class="submiter">
+          <%= submit "Enviar", class: "button button-big block-mobile" %>
+    </div>
+<% end %>
+
+<!-- END Content-->
+

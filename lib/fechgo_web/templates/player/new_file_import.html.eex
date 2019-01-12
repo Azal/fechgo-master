@@ -1,0 +1,17 @@
+<!-- Content, mantener este como el unico container para evitar sumar los margenes en retina-->
+<%= form_for @conn, player_path(@conn, :create_players_from_file), [multipart: true], fn f -> %>
+    <div id="content" class="container">
+        <div class="container-small formulario">
+            <h2>Importar lista de jugadores</h2>
+            <div class="row">
+              <div class='upload-panel'>
+                  <%= file_input f, :file, class: "button block-mobile upload-btn" %><br>
+              </div>
+            </div>
+            <div class="submiter">
+              <%= submit "Enviar", class: "button button-big block-mobile" %>
+            </div>
+        </div>
+    </div>
+<% end %>
+    <!-- END Content-->

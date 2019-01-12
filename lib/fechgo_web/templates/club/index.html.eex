@@ -1,0 +1,28 @@
+<h2>Listing Clubs</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Region</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for club <- @clubs do %>
+    <tr>
+      <td><%= club.name %></td>
+      <td><%= club.region %></td>
+
+      <td class="text-right">
+        <span><%= link "Show", to: club_path(@conn, :show, club), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Edit", to: club_path(@conn, :edit, club), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Delete", to: club_path(@conn, :delete, club), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Club", to: club_path(@conn, :new) %></span>

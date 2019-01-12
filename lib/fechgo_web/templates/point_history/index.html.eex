@@ -1,0 +1,30 @@
+<h2>Listing Points history</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Reason</th>
+      <th>Amount</th>
+      <th>Date</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for point_history <- @points_history do %>
+    <tr>
+      <td><%= point_history.reason %></td>
+      <td><%= point_history.amount %></td>
+      <td><%= point_history.date %></td>
+
+      <td class="text-right">
+        <span><%= link "Show", to: point_history_path(@conn, :show, point_history), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Edit", to: point_history_path(@conn, :edit, point_history), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Delete", to: point_history_path(@conn, :delete, point_history), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Point history", to: point_history_path(@conn, :new) %></span>

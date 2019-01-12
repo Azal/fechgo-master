@@ -1,0 +1,8 @@
+<!-- Content, mantener este como el unico container para evitar sumar los margenes en retina-->
+    <div id="content" class="container">
+        <div class="container-small formulario">
+        <h2>Crear un club</h2>
+            <%= render "form.html", Map.put(assigns, :action, club_path(@conn, :create)) %>
+        </div>
+    </div>
+<!-- END Content-->

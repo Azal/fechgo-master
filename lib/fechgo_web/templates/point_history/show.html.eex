@@ -1,0 +1,23 @@
+<h2>Show Point history</h2>
+
+<ul>
+
+  <li>
+    <strong>Reason:</strong>
+    <%= @point_history.reason %>
+  </li>
+
+  <li>
+    <strong>Amount:</strong>
+    <%= @point_history.amount %>
+  </li>
+
+  <li>
+    <strong>Date:</strong>
+    <%= @point_history.date %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: point_history_path(@conn, :edit, @point_history) %></span>
+<span><%= link "Back", to: point_history_path(@conn, :index) %></span>

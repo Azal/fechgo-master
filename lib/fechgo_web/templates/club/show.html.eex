@@ -1,0 +1,18 @@
+<h2>Show Club</h2>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @club.name %>
+  </li>
+
+  <li>
+    <strong>Region:</strong>
+    <%= @club.region %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: club_path(@conn, :edit, @club) %></span>
+<span><%= link "Back", to: club_path(@conn, :index) %></span>

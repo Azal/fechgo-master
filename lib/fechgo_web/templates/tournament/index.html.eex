@@ -1,0 +1,140 @@
+  <div class="filtros container">
+        <div class="row justify-content-between">
+            <div class="col-xs-12 col-md-4">
+            </div>
+
+            <div class="col-xs-12 col-md-4"></div>
+
+            <div class="col-xs-12 col-md-4">
+                <div class="form-collapse">
+                    <div class="input item item-main">
+                        <input id="search" placeholder="Buscar" type="text" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="torneos" class="container">
+        <!-- Stats Table -->
+        <div>
+            <table id="torneos-lista" class="with-avatar">
+              <%= for tournament <- get_sorted_tournaments_by_date(@tournaments) do %>
+                <!-- item-->
+                <tr>
+                    <% path = static_path(@conn, ~s(/uploads/#{tournament.main_img})) %>
+                    <td style="background-image:url(<%= path %>)">
+                      <%= link to: tournament_path(@conn, :show, tournament) do %>
+                        <div>
+                            <h3 class="tournament-name"><%= tournament.name %></h3>
+                            <h4 id="tournament-date-<%= tournament.id %>"></h4>
+                        </div>
+                      <% end %>
+                    </td>
+                    <td class="tournament-details">
+                        <i class="icon small tournament"></i>
+                        <p>Torneo</p>
+                        <h4><%= tournament.tournament_type.name %></h4>
+                    </td>
+                    <td class="tournament-details">
+                        <i class="icon small point"></i>
+                        <p>Puntos</p>
+                        <h4><%= get_total_points(tournament) %></h4>
+                    </td>
+                    <td class="tournament-details">
+                        <i class="icon small game"></i>
+                        <p>Rondas</p>
+                        <h4><%= Enum.count(tournament.rounds) %></h4>
+                    </td>
+                    <td class="tournament-details">
+                        <i class="icon small users"></i>
+                        <p>participantes</p>
+                        <h4><%= tournament.total_players %></h4>
+                    </td>
+                    <td>
+                      <% first_places = get_n_places_by_tournament(tournament, 1) %>
+                      <% second_places = get_n_places_by_tournament(tournament, 2) %>
+                      <% third_places = get_n_places_by_tournament(tournament, 3) %>
+                      <ul class="winners">
+                          <%= if Enum.count(first_places) > 0 do %>
+                          <li>
+                              <%= for scoreboard <- first_places do %>
+                                  <% player = get_player_by_scoreboard(scoreboard, @players) %>
+                                  <%= link Player.get_full_name(player), to: player_path(@conn, :show, player )%>
+                              <% end %>
+                          </li>
+                          <% end %>
+                          <%= if Enum.count(second_places) > 0 do %>
+                          <li>
+                              <%= for scoreboard <- second_places do %>
+                                  <% player = get_player_by_scoreboard(scoreboard, @players) %>
+                                  <%= link Player.get_full_name(player), to: player_path(@conn, :show, player )%>
+                              <% end %>
+                          </li>
+                          <% end %>
+                          <%= if Enum.count(third_places) > 0 do %>
+                          <li>
+                              <%= for scoreboard <- third_places do %>
+                                  <% player = get_player_by_scoreboard(scoreboard, @players) %>
+                                  <%= link Player.get_full_name(player), to: player_path(@conn, :show, player )%>
+                              <% end %>
+                          </li>
+                          <% end %>
+                      </ul>
+                      <%= if(@current_user) do %>
+                        <div class="actions"> <!-- CAMBIO IMPORTANTE -->
+                            <%= link to: tournament_path(@conn, :delete, tournament), method: :delete, data: [confirm: "Are you sure?"]  do %>
+                                <i class='icon delete'></i>
+                            <% end %>
+                            <%= link to: tournament_path(@conn, :edit, tournament) do %>
+                                <i class="icon edit"></i>
+                            <% end %>
+                        </div>
+                      <% end %>
+                    </td>
+                </tr>
+                <!-- END item-->
+                <% end %>
+            </table>
+        </div>
+        <!-- END Stats Table -->
+    </div>
+
+    <div class="pages container">
+        <ul class="paginator-list">
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link"> Anterior </a>
+            </li>
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link">1</a>
+            </li>
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link active">2</a>
+            </li>
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link">3</a>
+            </li>
+            <li class="paginator-list-item">
+                <a href="#" class="paginator-list-link">Siguiente</a>
+            </li>
+        </ul>
+    </div>
+    <script>
+    // Uses moment.js to set tournament date
+    moment.locale("es");
+    <%= for tournament <- @tournaments do %>
+      var date = moment("<%= tournament.date %>").format('D MMMM YYYY').replace(/\b\w/g, l => l.toUpperCase());
+      document.getElementById("tournament-date-<%= tournament.id %>").innerHTML = date;
+    <% end %>
+    // Filter tournaments items over their names on search input
+    $('#search').on('input',function(e){
+        $(".tournament-name").each(function(index){
+            var search = $("#search").val().toUpperCase()
+            var tournament_name = $(this).text().toUpperCase()
+            if(tournament_name.includes(search))
+                $(this).closest('tr').show()
+            else
+                $(this).closest('tr').hide()
+        })
+    });
+</script>

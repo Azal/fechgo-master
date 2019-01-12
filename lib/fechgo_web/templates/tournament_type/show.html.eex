@@ -1,0 +1,18 @@
+<h2>Show Tournament type</h2>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @tournament_type.name %>
+  </li>
+
+  <li>
+    <strong>Weight:</strong>
+    <%= @tournament_type.weight %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: tournament_type_path(@conn, :edit, @tournament_type) %></span>
+<span><%= link "Back", to: tournament_type_path(@conn, :index) %></span>

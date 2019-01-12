@@ -1,0 +1,27 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+    <div class="row">
+        <div>
+            <label class="label" for="name">Nombre</label>
+            <div class="input full-width">
+                <%= text_input f, :name, class: "form-control" %>
+                <%= error_tag f, :name %>
+            </div>
+        </div>
+        <div>
+            <label class="label" for="weight">Weight</label>
+            <div class="input full-width">
+                <%= number_input f, :weight, step: "any", class: "form-control" %>
+                <%= error_tag f, :weight %>
+            </div>
+        </div>
+    </div>
+    <div class="submiter">
+        <%= submit "Submit", class: "button button-big block-mobile" %>
+    </div>
+  <% end %>
+        

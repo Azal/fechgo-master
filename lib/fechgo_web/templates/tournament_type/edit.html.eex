@@ -1,0 +1,8 @@
+<!-- Content, mantener este como el unico container para evitar sumar los margenes en retina-->
+<div id="content" class="container">
+    <div class="container-small formulario">
+        <h2>Editar tipo de torneo</h2>
+        <%= render "form.html", Map.put(assigns, :action, tournament_type_path(@conn, :update, @tournament_type)) %>
+    </div>
+</div>
+<!-- END Content-->

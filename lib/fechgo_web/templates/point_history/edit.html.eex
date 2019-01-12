@@ -1,0 +1,5 @@
+<h2>Edit Point history</h2>
+
+<%= render "form.html", Map.put(assigns, :action, point_history_path(@conn, :update, @point_history)) %>
+
+<span><%= link "Back", to: point_history_path(@conn, :index) %></span>

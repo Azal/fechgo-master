@@ -1,0 +1,14 @@
+
+<!-- Content, mantener este como el unico container para evitar sumar los margenes en retina-->
+<div id="content" class="container">
+    <div class="container-small formulario">
+        <h2>Administración</h2>
+        <%= link "New User", to: user_path(@conn, :new) %><br/>
+        <%= link "New Club", to: club_path(@conn, :new) %><br/>
+        <%= link "New Player", to: player_path(@conn, :new) %><br/>
+        <%= link "Import Players from Excel", to: player_path(@conn, :new_file_import) %><br/>
+        <%= link "New Tournament", to: tournament_path(@conn, :new) %><br/>
+        <%= link "New Tournament Type", to: tournament_type_path(@conn, :new) %>
+    </div>
+</div>
+<!-- END Content-->

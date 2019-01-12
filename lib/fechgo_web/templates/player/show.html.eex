@@ -1,0 +1,355 @@
+<div class="perfil container">
+        <!-- Profile card -->
+        <div class="profile-card">
+            <div class="row">
+                <div class="col-xs-12 col-sm-8"> <!--Datos Principales-->
+                    <h1>
+                        <%= @player.first_name%> <br/>
+                        <%= @player.last_name%>
+                    </h1>
+                    <div class="rank-club">
+                        <div class="rank-title"><span>Ranking</span></div>
+                        <h2 class="rank-n"><%= Player.get_current_rank(@player, @ranking_history) %></h2>
+                        <div class="club">
+                            <p>Club</p>
+                            <h3><%= Player.get_club_name(@player) %></h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-4"><!-- foto perfil-->
+                    <div class="avatar">
+                    <%= if(@player.avatar) do %>
+                        <img src="<%= static_path(@conn, "/uploads/#{@player.avatar}") %> ">
+                    <% else %>
+                        <img src="<%= static_path(@conn, "/images/no-profile.jpg") %> ">
+                    <% end %>
+                    </div>
+                </div>
+                <div class="profile-details col-xs-12"> <!--Estadística principal-->
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <p>Ciudad</p>
+                            <h4><%= @player.city %></h4>
+                        </div>
+                        <div class="col-xs-3">
+                            <p>Jugador desde</p>
+                            <h4><%= Player.get_started_go_year(@player) %></h4>
+                        </div>
+                        <div class="col-xs-3">
+                            <p>Edad</p>
+                            <h4><%= Player.get_age(@player) %></h4>
+                            <span>(<%= @player.birthday %>)</span>
+                        </div>
+                        <div class="titulos col-xs-3">
+                        <% first = get_places_at(@player, 1) %>
+                        <% second = get_places_at(@player, 2) %>
+                        <% third = get_places_at(@player, 3) %>
+                            <p>Títulos</p>
+                            <span class="gold title"><%= first %></span>
+                            <span class="silver title"><%= second %></span>
+                            <span class="bronze title"><%= third %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Profile card-->
+
+        <!-- Statistics-->
+        <div class="statistics">
+            <h2>Estadísticas</h2>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="statistics-section">
+                        <h3>Desempeño</h3>
+                        <% victories = get_victories(@player) %>
+                        <% defeats = get_defeats(@player) %>
+                        <% draws = get_draws(@player) %>
+                      <div class="relative">  
+                        <div class="chart" id="performance-chart"></div>
+                        <div id="performance-index"></div>
+                      </div>
+                        <div class="row statistic-details">
+                            <div class="col-xs-3 col-sm-6 col-md-3">
+                                <h4><%= victories + defeats + draws %></h4>
+                                <p>Partidas</p>
+                            </div>
+                            <div class="col-xs-3 col-sm-6 col-md-3">
+                                <h4><%= victories %></h4>
+                                <p>Victorias</p>
+                            </div>
+                            <div class="col-xs-3 col-sm-6 col-md-3">
+                                <h4><%= defeats %></h4>
+                                <p>Derrotas</p>
+                            </div>
+                            <div class="col-xs-3 col-sm-6 col-md-3">
+                                <h4><%= draws %></h4>
+                                <p>Empates</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="statistics-section">
+                        <h3>Puntaje Histórico</h3>
+                        <div class="chart" id="ranking-history"></div>
+                        <div class="row statistic-details">
+                            <div class="col-xs-6">
+                                <h4><%= Player.get_current_points(@player, @ranking_history) %></h4>
+                                <p>Puntos</p>
+                            </div>
+                            <div class="col-xs-6">
+                                <h4><%= get_current_participation(@player, @ranking_history) %> % </h4>
+                                <p>Participación</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Statistics-->
+
+
+        <!-- Stats Table + tabs-->
+        <div class="stats-tables">
+            <!-- TABLES-->
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul class="tabs">
+                        <li class="tab col-xs-4"><a href="#Torneos">Torneos</a></li>
+                        <li class="tab col-xs-4"><a href="#Rivales">Oponentes</a></li>
+                        <li class="tab col-xs-4"><a href="#Partidas">Ranking Histórico</a></li>
+                    </ul>
+                </div>
+                
+            <!-- Tab content -->
+            <div id="Torneos" class="col-xs-12 tabs-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Region</th>
+                            <th>Puntos Recibidos</th>
+                            <th>Posicion</th>
+                            <th>Rondas</th>
+                            <th>Victorias</th>
+                            <th>Derrotas</th>
+                            <th>Empates</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <%= for tournament <- @tournaments do %>
+                      <% scoreboard = Enum.at(tournament.scoreboards, 0)%>
+                        <tr>
+                            <td><%= tournament.date %></td>
+                            <td><%= link tournament.name, to: tournament_path(@conn, :show, tournament) %></td>
+                            <td><%= tournament.tournament_type.name %></td>
+                            <td><%= tournament.location %></td>
+                            <td><%= get_points_by_scoreboard(scoreboard) %></td>
+                            <td><%= "#{scoreboard.placement} / #{tournament.total_players}" %> </td>
+                            <td><%= Enum.count(tournament.rounds) %></td>
+                            <td><%= scoreboard.victories %></td>
+                            <td><%= scoreboard.defeats %></td>
+                            <td><%= scoreboard.draws%></td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+            </div>
+                
+            <div id="Rivales" class="tabs-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Club</th>
+                            <th>Victorias</th>
+                            <th>Derrotas</th>
+                            <th>Empates</th>
+                            <th>Comparar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <%= for record <- @opponents do %>
+                        <tr>
+                            <td><%= link Player.get_full_name(record.opponent), to: player_path(@conn, :show, record.opponent) %></td>
+                            <td><%= Player.get_club_name(record.opponent) %></td>
+                            <td><%= record.victories %></td>
+                            <td><%= record.defeats %></td>
+                            <td><%= record.draws %></td>
+                            <td><%= link "Comparar", to: player_path(@conn, :show_compare, @player, record.opponent) %></td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+            </div>
+                
+            <div id="Partidas" class="tabs-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Torneo</th>
+                            <th>Ranking</th>
+                            <th>Puntos</th>
+                            <th>Participación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <%= for record <- process_ranking_history(@player, @ranking_history) do %>
+                        <tr>
+                            <td><%= record.tournament.date %></td>
+                            <td><%= link record.tournament.name, to: tournament_path(@conn, :show, record.tournament) %></td>
+                            <td><%= record.rank %></td>
+                            <td><%= record.points %></td>
+                            <td><%= record.participation %>%</td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END Stats Table + tabs-->
+    </div>
+<script>
+// Create performance chart
+$(function() {
+    var performance_index = <%= process_perfomance_index(victories, defeats, draws) %>
+    
+    var data = [
+      {
+        name: "Empates",
+        color: '#fff',
+        y: <%= draws%>
+      },
+      {
+        name: "Derrotas",
+        color: '#666666',
+        y: <%= defeats %>
+      },
+      { name: "Victorias",
+        color: '#46d450',
+        y: <%= victories %> 
+      }
+    ]
+    Highcharts.chart('performance-chart', {
+        chart: {
+            type: 'pie',
+            backgroundColor: 'rgba(255, 255, 255, 0.0)',
+            events:{
+              load: function(){
+                $('#performance-index').text(performance_index + " %")
+                $('#performance-index').css({
+                  "top": this.chartHeight / 2,
+                  "left": this.chartWidth / 2
+                });
+              }
+            }
+        },
+        credits: {
+         enabled: false
+        },
+        title: {
+            text: null
+        },
+        tooltip: {
+            useHTML: true,
+            formatter: function() {
+                //return  '<h2 style="text-align:center">' + this.point.name + '</h2><h1 style="text-align:center">' + this.y + '</h1>';
+                return  '<h3 style="text-align:center">' + this.point.name + '</h3>';
+            },
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            borderWidth: 0,
+            style: {
+                color: '#fff',
+            },
+        },
+        plotOptions: {
+          pie: {
+              borderColor: '#142123'
+          },
+          series: {
+              states: {
+                  hover: {
+                      enabled: false,
+                  }
+              }
+          }
+         },
+        series: [{
+            data: data,
+            size: '100%',
+            innerSize: '80%',
+            dataLabels: {
+                enabled: false
+            }
+        }]
+    });
+});
+// Create ranking history chart
+$(function(){
+  var data = (<%= raw(Poison.encode!(process_ranking_history_for_chart(@player, @ranking_history))) %>).reverse()
+  var line_data = [] // [[date, points], ... ]
+  for(i = 0; i < data.length; i++ ){
+    line_data.push({
+      x: Date.parse(data[i][0]), 
+      y: data[i][1], 
+      name: data[i][2], 
+      rank: data[i][3]})
+  }
+  Highcharts.chart('ranking-history', {
+    tooltip: {
+        //crosshairs: [true],
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        borderWidth: 0,
+        style: {
+            color: '#fff',
+        },
+        useHTML: true,
+        formatter: function() {
+            var date = moment(this.x).format('D MMMM YYYY').replace(/\b\w/g, l => l.toUpperCase())
+            return  '<div><h1>' + this.point.name + '</h1><h2>' + date + '</h2> Puntos: ' + this.y + '<br/> Rank: '+ this.point.rank + '</div>';
+        }
+    },
+    chart: {
+        backgroundColor: 'rgba(255, 255, 255, 0.0)',
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: null
+    },
+    legend: {
+              enabled: false
+            },
+    xAxis: {
+        type: 'datetime',
+        lineColor: '#999',
+        labels: {
+            style: {
+                color: '#999'
+            }
+        }
+    },
+    yAxis: {
+        title: null,
+        gridLineWidth: 0,
+        minorGridLineWidth: 0,
+        opposite: true,
+        lineColor: '#999',
+        lineWidth: 1,
+        labels: {
+            style: {
+                color: '#999'
+            }
+        }
+    },
+    series: [{
+        data: line_data
+    }],
+  });
+})
+ </script>

@@ -1,0 +1,5 @@
+<h2>Edit Round</h2>
+
+<%= render "form.html", Map.put(assigns, :action, round_path(@conn, :update, @round)) %>
+
+<span><%= link "Back", to: round_path(@conn, :index) %></span>
